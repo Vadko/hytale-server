@@ -1,0 +1,6 @@
+# Force LF line endings for scripts (required for Docker)
+*.sh text eol=lf
+entrypoint.sh text eol=lf
+
+# Auto-detect for everything else
+* text=auto

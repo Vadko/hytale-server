@@ -1,13 +1,13 @@
 FROM eclipse-temurin:25-jdk-alpine
 
-LABEL maintainer="hytale-server"
+LABEL maintainer="ketbome"
 LABEL description="Hytale Dedicated Server"
 
 # Non-root user for security
 RUN addgroup -S hytale && adduser -S -G hytale hytale
 
 # Minimal dependencies
-RUN apk add --no-cache curl unzip bash
+RUN apk add --no-cache bash dos2unix
 
 ENV SERVER_HOME=/opt/hytale
 ENV JAVA_XMS=4G
@@ -32,11 +32,15 @@ WORKDIR $SERVER_HOME
 RUN mkdir -p universe mods logs config .cache && \
     chown -R hytale:hytale $SERVER_HOME
 
-COPY --chown=hytale:hytale entrypoint.sh .
-RUN chmod +x entrypoint.sh
+COPY entrypoint.sh /opt/hytale/entrypoint.sh
+
+# Fix line endings and permissions
+RUN dos2unix /opt/hytale/entrypoint.sh && \
+    chmod +x /opt/hytale/entrypoint.sh && \
+    chown hytale:hytale /opt/hytale/entrypoint.sh
 
 USER hytale
 
 EXPOSE 5520/udp
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/opt/hytale/entrypoint.sh"]
