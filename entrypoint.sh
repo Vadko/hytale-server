@@ -3,27 +3,84 @@ set -e
 
 cd "$SERVER_HOME"
 
-# Check required files
-if [ ! -f "HytaleServer.jar" ]; then
+# Auto-download if enabled and files don't exist
+if [ "$AUTO_DOWNLOAD" = "true" ] && { [ ! -f "HytaleServer.jar" ] || [ ! -f "Assets.zip" ]; }; then
     echo "=============================================="
-    echo "ERROR: HytaleServer.jar not found"
+    echo "  DOWNLOADING SERVER FILES"
+    echo "=============================================="
     echo ""
-    echo "Download server files from:"
-    echo "https://hytale.com (requires account)"
+    echo "This will download the latest Hytale server."
+    echo "You may need to authenticate..."
     echo ""
-    echo "Place these files in ./server volume:"
+    
+    # Download using official downloader
+    if command -v hytale-downloader &> /dev/null; then
+        echo "Downloading with hytale-downloader..."
+        hytale-downloader --download-path /tmp/hytale-game.zip || {
+            echo ""
+            echo "=============================================="
+            echo "  AUTHENTICATION REQUIRED"
+            echo "=============================================="
+            echo ""
+            echo "Run this command to authenticate:"
+            echo "  hytale-downloader --login"
+            echo ""
+            echo "Or download manually from https://hytale.com"
+            echo "and place files in ./server folder:"
+            echo "  - HytaleServer.jar"
+            echo "  - Assets.zip"
+            echo ""
+            echo "Waiting for files..."
+            echo "=============================================="
+            
+            # Wait for manual files
+            while [ ! -f "HytaleServer.jar" ] || [ ! -f "Assets.zip" ]; do
+                sleep 10
+            done
+        }
+        
+        # Extract if download succeeded
+        if [ -f "/tmp/hytale-game.zip" ]; then
+            echo "Extracting files..."
+            unzip -o /tmp/hytale-game.zip -d /tmp/hytale-extract
+            
+            # Find and move files
+            find /tmp/hytale-extract -name "HytaleServer.jar" -exec cp {} "$SERVER_HOME/" \;
+            find /tmp/hytale-extract -name "Assets.zip" -exec cp {} "$SERVER_HOME/" \;
+            
+            rm -rf /tmp/hytale-game.zip /tmp/hytale-extract
+            echo "Download complete!"
+        fi
+    fi
+fi
+
+# Final check - wait if still missing
+if [ ! -f "HytaleServer.jar" ] || [ ! -f "Assets.zip" ]; then
+    echo "=============================================="
+    echo "  WAITING FOR SERVER FILES"
+    echo "=============================================="
+    echo ""
+    echo "Place these files in ./server folder:"
     echo "  - HytaleServer.jar"
     echo "  - Assets.zip"
+    echo ""
+    echo "Download from: https://hytale.com"
+    echo "Checking every 10 seconds..."
     echo "=============================================="
-    exit 1
+    
+    while [ ! -f "HytaleServer.jar" ] || [ ! -f "Assets.zip" ]; do
+        sleep 10
+        if [ -f "HytaleServer.jar" ] && [ -f "Assets.zip" ]; then
+            echo "Files found! Starting server..."
+            break
+        fi
+    done
 fi
 
-if [ ! -f "Assets.zip" ]; then
-    echo "ERROR: Assets.zip not found"
-    exit 1
-fi
-
-echo "Starting Hytale Server..."
+echo ""
+echo "=============================================="
+echo "  Starting Hytale Server"
+echo "=============================================="
 echo "RAM: ${JAVA_XMS} - ${JAVA_XMX}"
 echo "Bind: ${BIND_ADDR}:${BIND_PORT}/udp"
 echo ""
@@ -90,7 +147,7 @@ rm -f "$PIPE"
 mkfifo "$PIPE"
 chmod 666 "$PIPE"
 
-# Background process to read from pipe and forward to stdin
+# Background process to read from pipe
 (while true; do
     if read -r cmd < "$PIPE" 2>/dev/null; then
         echo "$cmd"

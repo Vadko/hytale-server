@@ -1,415 +1,832 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hytale Server Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      :root {
+        --mc-green: #5cba47;
+        --mc-green-dark: #3d8c2f;
+        --mc-green-light: #7ed56f;
+        --mc-dirt: #8b6914;
+        --mc-stone: #7d7d7d;
+        --bg-primary: #1e1e1e;
+        --bg-secondary: #2d2d2d;
+        --bg-tertiary: #3a3a3a;
+        --border: #404040;
+        --text: #e8e8e8;
+        --text-dim: #999;
+        --error: #e74c3c;
+        --warning: #f39c12;
+        --success: #5cba47;
+      }
 
-        body {
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            background: #0a0a0f;
-            color: #e0e0e0;
-            min-height: 100vh;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+      body {
+        font-family: "Inter", -apple-system, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text);
+        min-height: 100vh;
+        line-height: 1.5;
+      }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid #1a1a2e;
-            margin-bottom: 20px;
-        }
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+      }
 
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #00d4aa;
-        }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: var(--bg-secondary);
+        border: 2px solid var(--border);
+        margin-bottom: 20px;
+      }
 
-        .status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
 
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #ff4757;
-            animation: pulse 2s infinite;
-        }
+      .logo-box {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(
+          180deg,
+          var(--mc-green) 0%,
+          var(--mc-green-dark) 100%
+        );
+        border: 2px solid var(--mc-green-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        .status-dot.online {
-            background: #00d4aa;
-        }
+      .logo-box span {
+        font-family: "VT323", monospace;
+        font-size: 24px;
+        color: #fff;
+        text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+      }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+      .logo h1 {
+        font-family: "VT323", monospace;
+        font-size: 28px;
+        color: var(--mc-green);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
 
+      .status-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 16px;
+        background: var(--bg-primary);
+        border: 2px solid var(--border);
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        background: var(--error);
+      }
+
+      .status-dot.online {
+        background: var(--success);
+        box-shadow: 0 0 8px var(--success);
+      }
+
+      .status-text {
+        font-family: "VT323", monospace;
+        font-size: 18px;
+        text-transform: uppercase;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 20px;
+      }
+
+      @media (max-width: 1000px) {
         .grid {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 20px;
+          grid-template-columns: 1fr;
         }
+      }
 
-        @media (max-width: 900px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
+      .card {
+        background: var(--bg-secondary);
+        border: 2px solid var(--border);
+      }
 
-        .panel {
-            background: #12121a;
-            border: 1px solid #1a1a2e;
-            border-radius: 8px;
-            overflow: hidden;
-        }
+      .card-header {
+        padding: 12px 16px;
+        background: var(--bg-tertiary);
+        border-bottom: 2px solid var(--border);
+        font-family: "VT323", monospace;
+        font-size: 18px;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-        .panel-header {
-            background: #1a1a2e;
-            padding: 12px 16px;
-            font-size: 0.85rem;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+      .console {
+        height: 480px;
+        background: #0c0c0c;
+        overflow-y: auto;
+        padding: 12px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 13px;
+        line-height: 1.6;
+      }
 
-        .console {
-            height: 500px;
-            overflow-y: auto;
-            padding: 16px;
-            font-size: 0.85rem;
-            line-height: 1.6;
-        }
+      .console::-webkit-scrollbar {
+        width: 12px;
+      }
 
-        .console::-webkit-scrollbar {
-            width: 8px;
-        }
+      .console::-webkit-scrollbar-track {
+        background: #0c0c0c;
+      }
 
-        .console::-webkit-scrollbar-track {
-            background: #0a0a0f;
-        }
+      .console::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border: 2px solid #0c0c0c;
+      }
 
-        .console::-webkit-scrollbar-thumb {
-            background: #2a2a3e;
-            border-radius: 4px;
-        }
+      .log-line {
+        padding: 2px 0;
+        color: #aaa;
+        white-space: pre-wrap;
+        word-break: break-all;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      }
 
-        .log-line {
-            white-space: pre-wrap;
-            word-break: break-all;
-            color: #aaa;
-        }
+      .log-line:last-child {
+        border-bottom: none;
+      }
 
-        .log-line.error {
-            color: #ff6b6b;
-        }
+      .log-line.error {
+        color: var(--error);
+        background: rgba(231, 76, 60, 0.1);
+        padding: 4px 8px;
+        margin: 2px 0;
+      }
 
-        .log-line.warn {
-            color: #ffa502;
-        }
+      .log-line.warn {
+        color: var(--warning);
+      }
 
-        .log-line.info {
-            color: #00d4aa;
-        }
+      .log-line.info {
+        color: var(--success);
+      }
 
-        .command-input {
-            display: flex;
-            border-top: 1px solid #1a1a2e;
-        }
+      .log-line.cmd {
+        color: #5dade2;
+        font-weight: 500;
+      }
 
-        .command-input input {
-            flex: 1;
-            background: #0a0a0f;
-            border: none;
-            padding: 16px;
-            color: #e0e0e0;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
+      .log-line.separator {
+        color: var(--mc-green);
+        background: rgba(92, 186, 71, 0.1);
+        padding: 4px 8px;
+        margin: 4px 0;
+        font-weight: 600;
+      }
 
-        .command-input input:focus {
-            outline: none;
-            background: #0f0f18;
-        }
+      .command-bar {
+        display: flex;
+        border-top: 2px solid var(--border);
+      }
 
-        .command-input button {
-            background: #00d4aa;
-            border: none;
-            padding: 16px 24px;
-            color: #0a0a0f;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+      .command-bar input {
+        flex: 1;
+        background: var(--bg-primary);
+        border: none;
+        padding: 14px 16px;
+        color: var(--text);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 14px;
+      }
 
-        .command-input button:hover {
-            background: #00b894;
-        }
+      .command-bar input:focus {
+        outline: none;
+        background: #252525;
+      }
 
-        .quick-commands {
-            padding: 16px;
-        }
+      .command-bar input::placeholder {
+        color: var(--text-dim);
+      }
 
-        .quick-btn {
-            width: 100%;
-            background: #1a1a2e;
-            border: 1px solid #2a2a3e;
-            padding: 12px 16px;
-            margin-bottom: 8px;
-            color: #e0e0e0;
-            border-radius: 6px;
-            cursor: pointer;
-            text-align: left;
-            font-family: inherit;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
+      .command-bar button {
+        background: var(--mc-green);
+        border: none;
+        padding: 14px 24px;
+        color: #fff;
+        font-family: "VT323", monospace;
+        font-size: 18px;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-left: 2px solid var(--mc-green-dark);
+      }
 
-        .quick-btn:hover {
-            background: #2a2a3e;
-            border-color: #00d4aa;
-        }
+      .command-bar button:hover {
+        background: var(--mc-green-light);
+      }
 
-        .quick-btn.auth {
-            background: linear-gradient(135deg, #1a1a2e, #2a1a3e);
-            border-color: #9b59b6;
-        }
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
 
-        .quick-btn.auth:hover {
-            border-color: #8e44ad;
-        }
+      .setup-card {
+        border-color: var(--mc-green-dark);
+      }
 
-        .quick-btn .cmd {
-            color: #00d4aa;
-            font-size: 0.75rem;
-            margin-top: 4px;
-        }
+      .setup-card .card-header {
+        background: linear-gradient(
+          180deg,
+          var(--mc-green) 0%,
+          var(--mc-green-dark) 100%
+        );
+        color: #fff;
+        border-bottom-color: var(--mc-green-dark);
+      }
 
-        .info-panel {
-            padding: 16px;
-            font-size: 0.85rem;
-        }
+      .setup-content {
+        padding: 16px;
+      }
 
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #1a1a2e;
-        }
+      .file-status {
+        padding: 12px;
+        background: var(--bg-primary);
+        border: 2px solid var(--border);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
-        .info-row:last-child {
-            border-bottom: none;
-        }
+      .file-status.ready {
+        border-color: var(--success);
+        background: rgba(92, 186, 71, 0.1);
+      }
 
-        .info-label {
-            color: #666;
-        }
+      .file-status.missing {
+        border-color: var(--error);
+        background: rgba(231, 76, 60, 0.1);
+      }
 
-        .info-value {
-            color: #00d4aa;
-        }
+      .file-status-text {
+        font-family: "VT323", monospace;
+        font-size: 16px;
+      }
 
-        .auth-notice {
-            background: linear-gradient(135deg, #1a1a2e, #2a1a3e);
-            border: 1px solid #9b59b6;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
+      .file-checks {
+        margin-bottom: 12px;
+      }
 
-        .auth-notice h3 {
-            color: #9b59b6;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-        }
+      .file-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border);
+        margin-bottom: 6px;
+        font-size: 13px;
+        font-family: "IBM Plex Mono", monospace;
+      }
 
-        .auth-notice p {
-            font-size: 0.8rem;
-            color: #888;
-            line-height: 1.5;
+      .file-check:last-child {
+        margin-bottom: 0;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--border);
+        cursor: pointer;
+        font-family: "VT323", monospace;
+        font-size: 16px;
+        text-transform: uppercase;
+        transition: all 0.1s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-primary {
+        background: var(--mc-green);
+        color: #fff;
+        border-color: var(--mc-green-dark);
+      }
+
+      .btn-primary:hover {
+        background: var(--mc-green-light);
+      }
+
+      .btn-secondary {
+        background: var(--bg-tertiary);
+        color: var(--text);
+      }
+
+      .btn-secondary:hover {
+        background: #454545;
+      }
+
+      .btn-danger {
+        background: var(--error);
+        color: #fff;
+        border-color: #c0392b;
+      }
+
+      .btn-danger:hover {
+        background: #e55d4f;
+      }
+
+      .quick-list {
+        padding: 8px;
+      }
+
+      .quick-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border);
+        color: var(--text);
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+        text-align: left;
+        margin-bottom: 6px;
+        transition: all 0.1s;
+      }
+
+      .quick-btn:last-child {
+        margin-bottom: 0;
+      }
+
+      .quick-btn:hover {
+        border-color: var(--mc-green);
+        background: rgba(92, 186, 71, 0.1);
+      }
+
+      .quick-btn .cmd {
+        margin-left: auto;
+        color: var(--text-dim);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+      }
+
+      .control-panel {
+        padding: 12px;
+      }
+
+      .control-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .info-panel {
+        padding: 12px;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+      }
+
+      .info-row:last-child {
+        border-bottom: none;
+      }
+
+      .info-label {
+        color: var(--text-dim);
+      }
+
+      .info-value {
+        font-family: "IBM Plex Mono", monospace;
+        color: var(--mc-green);
+      }
+
+      .uptime {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 13px;
+        color: var(--text-dim);
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        background: var(--bg-secondary);
+        border: 2px solid var(--success);
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        animation: slideIn 0.2s ease;
+        z-index: 1000;
+      }
+
+      .toast.error {
+        border-color: var(--error);
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
         }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <header>
-            <h1>⚔️ Hytale Server Panel</h1>
-            <div class="status">
-                <div class="status-dot" id="status-dot"></div>
-                <span id="status-text">Connecting...</span>
-            </div>
-        </header>
+      <header>
+        <div class="logo">
+          <div class="logo-box"><span>H</span></div>
+          <h1>Hytale Server</h1>
+        </div>
+        <div class="status-box">
+          <div class="status-dot" id="status-dot"></div>
+          <span class="status-text" id="status-text">Offline</span>
+        </div>
+      </header>
 
-        <div class="auth-notice">
-            <h3>🔐 First Time Setup</h3>
-            <p>Click "Authenticate Server" below, then check the console for a URL and code. Visit the URL and enter the code to authenticate.</p>
+      <div class="grid">
+        <div class="main">
+          <div class="card">
+            <div class="card-header">
+              <span>Console</span>
+              <span class="uptime" id="uptime">00:00:00</span>
+            </div>
+            <div class="console" id="console"></div>
+            <div class="command-bar">
+              <input
+                type="text"
+                id="cmd-input"
+                placeholder="Enter command..."
+                autocomplete="off"
+              />
+              <button id="send-btn">Send</button>
+            </div>
+          </div>
         </div>
 
-        <div class="grid">
-            <div class="panel">
-                <div class="panel-header">Console Output</div>
-                <div class="console" id="console"></div>
-                <div class="command-input">
-                    <input type="text" id="cmd-input" placeholder="Enter command (e.g., /whitelist add player)" autocomplete="off">
-                    <button id="send-btn">Send</button>
+        <div class="sidebar">
+          <div class="card setup-card">
+            <div class="card-header">Setup</div>
+            <div class="setup-content">
+              <div class="file-status" id="file-status">
+                <span id="setup-icon">?</span>
+                <span class="file-status-text" id="setup-text"
+                  >Checking...</span
+                >
+              </div>
+              <div class="file-checks">
+                <div class="file-check" id="check-jar">
+                  <span class="icon">?</span>
+                  <span>HytaleServer.jar</span>
                 </div>
+                <div class="file-check" id="check-assets">
+                  <span class="icon">?</span>
+                  <span>Assets.zip</span>
+                </div>
+              </div>
+              <button class="btn btn-primary" id="download-btn">
+                Download Files
+              </button>
             </div>
+          </div>
 
-            <div>
-                <div class="panel" style="margin-bottom: 20px;">
-                    <div class="panel-header">Quick Commands</div>
-                    <div class="quick-commands">
-                        <button class="quick-btn auth" data-cmd="/auth login device">
-                            🔐 Authenticate Server
-                            <div class="cmd">/auth login device</div>
-                        </button>
-                        <button class="quick-btn" data-cmd="/save">
-                            💾 Save World
-                            <div class="cmd">/save</div>
-                        </button>
-                        <button class="quick-btn" data-cmd="/whitelist on">
-                            ✅ Enable Whitelist
-                            <div class="cmd">/whitelist on</div>
-                        </button>
-                        <button class="quick-btn" data-cmd="/whitelist off">
-                            ❌ Disable Whitelist
-                            <div class="cmd">/whitelist off</div>
-                        </button>
-                        <button class="quick-btn" data-cmd="/stop">
-                            ⛔ Stop Server
-                            <div class="cmd">/stop</div>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-header">Server Info</div>
-                    <div class="info-panel">
-                        <div class="info-row">
-                            <span class="info-label">Status</span>
-                            <span class="info-value" id="info-status">-</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Uptime</span>
-                            <span class="info-value" id="info-uptime">-</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Port</span>
-                            <span class="info-value">5520/UDP</span>
-                        </div>
-                    </div>
-                </div>
+          <div class="card">
+            <div class="card-header">Quick Actions</div>
+            <div class="quick-list">
+              <button class="quick-btn" data-cmd="/auth login device">
+                <span>Authenticate Server</span>
+                <span class="cmd">/auth login device</span>
+              </button>
+              <button class="quick-btn" data-cmd="/save">
+                <span>Save World</span>
+                <span class="cmd">/save</span>
+              </button>
+              <button class="quick-btn" data-cmd="/whitelist on">
+                <span>Enable Whitelist</span>
+                <span class="cmd">/whitelist on</span>
+              </button>
+              <button class="quick-btn" data-cmd="/whitelist off">
+                <span>Disable Whitelist</span>
+                <span class="cmd">/whitelist off</span>
+              </button>
             </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">Control</div>
+            <div class="control-panel">
+              <div class="control-grid">
+                <button class="btn btn-primary" id="start-btn">Start</button>
+                <button class="btn btn-secondary" id="restart-btn">
+                  Restart
+                </button>
+              </div>
+              <button class="btn btn-danger" id="stop-btn">Stop Server</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">Info</div>
+            <div class="info-panel">
+              <div class="info-row">
+                <span class="info-label">Status</span>
+                <span class="info-value" id="info-status">Unknown</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Game Port</span>
+                <span class="info-value">5520/UDP</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Panel</span>
+                <span class="info-value">3000/TCP</span>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        const consoleEl = document.getElementById('console');
-        const cmdInput = document.getElementById('cmd-input');
-        const sendBtn = document.getElementById('send-btn');
-        const statusDot = document.getElementById('status-dot');
-        const statusText = document.getElementById('status-text');
-        const infoStatus = document.getElementById('info-status');
-        const infoUptime = document.getElementById('info-uptime');
+      const socket = io();
+      const consoleEl = document.getElementById("console");
+      const cmdInput = document.getElementById("cmd-input");
+      const statusDot = document.getElementById("status-dot");
+      const statusText = document.getElementById("status-text");
+      const infoStatus = document.getElementById("info-status");
+      const uptimeEl = document.getElementById("uptime");
+      const fileStatus = document.getElementById("file-status");
+      const setupIcon = document.getElementById("setup-icon");
+      const setupText = document.getElementById("setup-text");
+      const checkJar = document.getElementById("check-jar");
+      const checkAssets = document.getElementById("check-assets");
+      const downloadBtn = document.getElementById("download-btn");
 
-        function addLog(text, type = '') {
-            const line = document.createElement('div');
-            line.className = 'log-line ' + type;
-            line.textContent = text;
-            consoleEl.appendChild(line);
-            consoleEl.scrollTop = consoleEl.scrollHeight;
-            
-            // Keep only last 500 lines
-            while (consoleEl.children.length > 500) {
-                consoleEl.removeChild(consoleEl.firstChild);
-            }
+      let lastCommandTime = 0;
+
+      function addLog(text, type = "") {
+        // Split by timestamp pattern and filter empty
+        const lines = text.split(/(?=\d{4}-\d{2}-\d{2}T)/);
+
+        lines.forEach((line) => {
+          const trimmed = line.trim();
+          if (!trimmed) return;
+
+          // Remove timestamp prefix for cleaner display
+          const cleanLine = trimmed.replace(
+            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s*/,
+            ""
+          );
+          if (!cleanLine) return;
+
+          const div = document.createElement("div");
+
+          // Check for separator lines
+          if (cleanLine.includes("====")) {
+            div.className = "log-line separator";
+          } else {
+            div.className = "log-line " + (type || getLogType(cleanLine));
+          }
+
+          div.textContent = cleanLine;
+          consoleEl.appendChild(div);
+        });
+
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+
+        while (consoleEl.children.length > 500) {
+          consoleEl.removeChild(consoleEl.firstChild);
         }
+      }
 
-        function getLogType(text) {
-            if (text.includes('ERROR') || text.includes('Exception')) return 'error';
-            if (text.includes('WARN')) return 'warn';
-            if (text.includes('INFO') || text.includes('Starting')) return 'info';
-            return '';
+      function showToast(message, type = "") {
+        const existing = document.querySelector(".toast");
+        if (existing) existing.remove();
+
+        const toast = document.createElement("div");
+        toast.className = "toast " + type;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      }
+
+      function getLogType(text) {
+        if (
+          text.includes("ERROR") ||
+          text.includes("Exception") ||
+          text.includes("failed")
+        )
+          return "error";
+        if (text.includes("WARN")) return "warn";
+        if (
+          text.includes("Starting") ||
+          text.includes("complete") ||
+          text.includes("ready")
+        )
+          return "info";
+        return "";
+      }
+
+      function formatUptime(startedAt) {
+        if (!startedAt) return "00:00:00";
+        const diff = Math.floor((Date.now() - new Date(startedAt)) / 1000);
+        const h = Math.floor(diff / 3600)
+          .toString()
+          .padStart(2, "0");
+        const m = Math.floor((diff % 3600) / 60)
+          .toString()
+          .padStart(2, "0");
+        const s = (diff % 60).toString().padStart(2, "0");
+        return `${h}:${m}:${s}`;
+      }
+
+      function updateFileStatus(files) {
+        checkJar.querySelector(".icon").textContent = files.hasJar ? "OK" : "X";
+        checkAssets.querySelector(".icon").textContent = files.hasAssets
+          ? "OK"
+          : "X";
+
+        if (files.ready) {
+          fileStatus.className = "file-status ready";
+          setupIcon.textContent = "OK";
+          setupText.textContent = "Files ready";
+          downloadBtn.textContent = "Re-download";
+        } else {
+          fileStatus.className = "file-status missing";
+          setupIcon.textContent = "!";
+          setupText.textContent = "Missing files";
+          downloadBtn.textContent = "Download Files";
         }
+      }
 
-        function formatUptime(startedAt) {
-            if (!startedAt) return '-';
-            const start = new Date(startedAt);
-            const now = new Date();
-            const diff = Math.floor((now - start) / 1000);
-            
-            const hours = Math.floor(diff / 3600);
-            const minutes = Math.floor((diff % 3600) / 60);
-            const seconds = diff % 60;
-            
-            if (hours > 0) return `${hours}h ${minutes}m`;
-            if (minutes > 0) return `${minutes}m ${seconds}s`;
-            return `${seconds}s`;
+      socket.on("log", (text) => addLog(text.trim()));
+
+      socket.on("status", (status) => {
+        statusDot.className = "status-dot" + (status.running ? " online" : "");
+        statusText.textContent = status.running ? "Online" : "Offline";
+        infoStatus.textContent = status.status || "Unknown";
+        uptimeEl.textContent = formatUptime(status.startedAt);
+      });
+
+      socket.on("files", updateFileStatus);
+
+      socket.on("command-result", (result) => {
+        if (result.error) {
+          addLog("Error: " + result.error, "error");
+          showToast("Command failed", "error");
         }
+      });
 
-        socket.on('log', (text) => {
-            addLog(text.trim(), getLogType(text));
-        });
-
-        socket.on('status', (status) => {
-            const isOnline = status.running;
-            statusDot.className = 'status-dot' + (isOnline ? ' online' : '');
-            statusText.textContent = isOnline ? 'Online' : 'Offline';
-            infoStatus.textContent = status.status || '-';
-            infoUptime.textContent = formatUptime(status.startedAt);
-        });
-
-        socket.on('command-result', (result) => {
-            if (result.error) {
-                addLog(`Error: ${result.error}`, 'error');
-            } else {
-                addLog(`> ${result.cmd}`, 'info');
-            }
-        });
-
-        socket.on('error', (msg) => {
-            addLog(msg, 'error');
-        });
-
-        function sendCommand() {
-            const cmd = cmdInput.value.trim();
-            if (cmd) {
-                socket.emit('command', cmd);
-                cmdInput.value = '';
-            }
+      socket.on("download-status", (status) => {
+        if (status.status === "starting") {
+          downloadBtn.disabled = true;
+          downloadBtn.innerHTML =
+            '<span class="spinner"></span> Downloading...';
+        } else {
+          downloadBtn.disabled = false;
+          downloadBtn.textContent = "Download Files";
+          if (status.status === "complete") {
+            showToast("Download complete");
+            socket.emit("check-files");
+          } else {
+            showToast("Download failed", "error");
+          }
         }
+      });
 
-        sendBtn.addEventListener('click', sendCommand);
-        cmdInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendCommand();
-        });
+      socket.on("action-status", (status) => {
+        if (status.success) showToast(status.action + " successful");
+        else if (status.error) showToast(status.action + " failed", "error");
+      });
 
-        document.querySelectorAll('.quick-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const cmd = btn.dataset.cmd;
-                socket.emit('command', cmd);
-                addLog(`> ${cmd}`, 'info');
-            });
+      socket.on("error", (msg) => {
+        addLog(msg, "error");
+        showToast(msg, "error");
+      });
+
+      function sendCommand(cmd) {
+        // Debounce - prevent double sends
+        const now = Date.now();
+        if (now - lastCommandTime < 300) return;
+        lastCommandTime = now;
+
+        if (cmd) {
+          addLog("> " + cmd, "cmd");
+          socket.emit("command", cmd);
+        }
+      }
+
+      document.getElementById("send-btn").addEventListener("click", () => {
+        const cmd = cmdInput.value.trim();
+        if (cmd) {
+          sendCommand(cmd);
+          cmdInput.value = "";
+        }
+      });
+
+      cmdInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          const cmd = cmdInput.value.trim();
+          if (cmd) {
+            sendCommand(cmd);
+            cmdInput.value = "";
+          }
+        }
+      });
+
+      document.querySelectorAll(".quick-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          sendCommand(btn.dataset.cmd);
         });
+      });
+
+      downloadBtn.addEventListener("click", () => {
+        socket.emit("download");
+      });
+
+      document.getElementById("start-btn").addEventListener("click", () => {
+        socket.emit("start");
+      });
+
+      document.getElementById("restart-btn").addEventListener("click", () => {
+        if (confirm("Restart server?")) socket.emit("restart");
+      });
+
+      document.getElementById("stop-btn").addEventListener("click", () => {
+        if (confirm("Stop server?")) sendCommand("/stop");
+      });
+
+      socket.emit("check-files");
     </script>
-</body>
+  </body>
 </html>

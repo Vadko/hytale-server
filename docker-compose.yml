@@ -12,6 +12,7 @@ services:
       JAVA_XMX: "8G"
       BIND_PORT: "5520"
       BIND_ADDR: "0.0.0.0"
+      AUTO_DOWNLOAD: "true"
       USE_G1GC: "true"
       # VIEW_DISTANCE: "12"
       # MAX_PLAYERS: "20"
