@@ -1,6 +1,6 @@
 services:
   hytale:
-    image: ketbom/hytale-server:latest
+    image: vadko/hytale-server:latest
     container_name: hytale-server
     restart: unless-stopped
     stdin_open: true
@@ -24,7 +24,7 @@ services:
       - /sys/class/dmi/id:/sys/class/dmi/id:ro
 
   panel:
-    image: ketbom/hytale-panel:latest
+    image: vadko/hytale-panel:latest
     container_name: hytale-panel
     restart: unless-stopped
     ports:

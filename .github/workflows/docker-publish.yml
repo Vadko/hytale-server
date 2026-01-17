@@ -62,8 +62,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ketbom/hytale-server:${{ steps.config.outputs.version }}
-            ketbom/hytale-server:latest
+            vadko/hytale-server:${{ steps.config.outputs.version }}
+            vadko/hytale-server:latest
           labels: |
             org.opencontainers.image.title=${{ steps.config.outputs.title }}
             org.opencontainers.image.description=${{ steps.config.outputs.description }}
@@ -78,8 +78,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ketbom/hytale-panel:${{ steps.config.outputs.version }}
-            ketbom/hytale-panel:latest
+            vadko/hytale-panel:${{ steps.config.outputs.version }}
+            vadko/hytale-panel:latest
           labels: |
             org.opencontainers.image.title=Hytale Panel
             org.opencontainers.image.description=Web panel for Hytale Server
@@ -126,8 +126,8 @@ jobs:
             ```
 
             ### Docker Images
-            - `ketbom/hytale-server:${{ steps.config.outputs.version }}`
-            - `ketbom/hytale-panel:${{ steps.config.outputs.version }}`
+            - `vadko/hytale-server:${{ steps.config.outputs.version }}`
+            - `vadko/hytale-panel:${{ steps.config.outputs.version }}`
           draft: false
           prerelease: false
           generate_release_notes: true
