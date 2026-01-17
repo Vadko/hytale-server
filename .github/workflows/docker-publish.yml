@@ -3,7 +3,7 @@ name: Build and Push Docker Images
 on:
   push:
     branches:
-      - main
+      - personal
     paths:
       - "Dockerfile"
       - "entrypoint.sh"
@@ -12,7 +12,7 @@ on:
       - ".github/workflows/docker-publish.yml"
   pull_request:
     branches:
-      - main
+      - personal
   workflow_dispatch:
 
 env:
@@ -118,7 +118,7 @@ jobs:
             ### Quick Start
             ```bash
             mkdir hytale && cd hytale
-            curl -O https://raw.githubusercontent.com/${{ github.repository }}/main/docker-compose.yml
+            curl -O https://raw.githubusercontent.com/${{ github.repository }}/personal/docker-compose.yml
             mkdir -p server data/universe data/mods data/logs data/config
             # Add HytaleServer.jar and Assets.zip to ./server/
             docker compose up -d
