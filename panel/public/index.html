@@ -858,14 +858,14 @@
       <div class="sidebar">
         <div class="card">
           <div class="tabs-header">
+            <button class="tab-btn" data-tab="control">Control</button>
             <button class="tab-btn active" data-tab="setup">Setup</button>
             <button class="tab-btn" data-tab="files">Files</button>
             <button class="tab-btn" data-tab="commands">Commands</button>
-            <button class="tab-btn" data-tab="control">Control</button>
           </div>
 
           <!-- Setup Tab -->
-          <div class="tab-content active" id="tab-setup">
+          <div class="tab-content" id="tab-setup">
             <div class="file-status" id="file-status">
               <span id="setup-icon">?</span>
               <span id="setup-text">Checking...</span>
@@ -940,7 +940,7 @@
           </div>
 
           <!-- Commands Tab -->
-          <div class="tab-content" id="tab-commands">
+          <div class="tab-content active" id="tab-commands">
             <div class="cmd-section">
               <div class="cmd-label">Auth</div>
               <button class="quick-btn" data-cmd="/auth login device"><span>Login</span><span class="cmd">/auth login device</span></button>
