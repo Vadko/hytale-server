@@ -6,7 +6,16 @@
   <title>Hytale Server Panel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: '8bit Operator';
+      src: url('/fonts/8bitoperator_jve.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+  </style>
   <style>
     :root {
       --hytale-orange: #f5a623;
@@ -24,15 +33,21 @@
       --success: #55ff55;
       --warning: #ffaa00;
       --error: #ff5555;
+      --font-ui: 'VT323', monospace;
+    }
+
+    body[data-lang="uk"] {
+      --font-ui: '8bit Operator', monospace;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'VT323', monospace;
+      font-family: var(--font-ui);
       background: var(--mc-darker);
       color: var(--text);
       min-height: 100vh;
+      font-size: 18px;
     }
 
     body::before {
@@ -50,7 +65,7 @@
 
     /* MC Buttons */
     .mc-btn {
-      font-family: 'VT323', monospace;
+      font-family: var(--font-ui);
       font-size: 18px;
       padding: 10px 16px;
       background: linear-gradient(180deg, #7a7a7a 0%, #5a5a5a 50%, #4a4a4a 50%, #3a3a3a 100%);
@@ -247,7 +262,7 @@
       border-left: 3px solid #2a4a1a;
       padding: 12px 20px;
       color: var(--text);
-      font-family: 'VT323', monospace;
+      font-family: var(--font-ui);
       font-size: 20px;
       cursor: pointer;
       text-shadow: 2px 2px 0 #2a4a1a;
@@ -269,7 +284,7 @@
 
     .tab-btn {
       flex: 1;
-      font-family: 'VT323', monospace;
+      font-family: var(--font-ui);
       font-size: 16px;
       padding: 10px 8px;
       background: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
@@ -364,7 +379,7 @@
       border-color: #3a3a3a #1a1a1a #1a1a1a #3a3a3a;
       color: var(--text);
       cursor: pointer;
-      font-family: 'VT323', monospace;
+      font-family: var(--font-ui);
       font-size: 16px;
       margin-bottom: 4px;
     }
@@ -761,35 +776,45 @@
 
     /* Language Selector */
     .lang-selector {
-      display: flex;
+      position: relative;
+    }
+
+    .lang-dropdown {
+      font-family: var(--font-ui);
+      font-size: 14px;
+      padding: 6px 28px 6px 10px;
       background: var(--mc-dark);
       border: 2px solid var(--mc-border-light);
-      overflow: hidden;
-    }
-
-    .lang-btn {
-      font-family: 'VT323', monospace;
-      font-size: 14px;
-      padding: 6px 10px;
-      background: transparent;
-      border: none;
-      color: var(--text-dim);
-      cursor: pointer;
-      transition: all 0.1s;
-    }
-
-    .lang-btn:not(:last-child) {
-      border-right: 1px solid var(--mc-border-light);
-    }
-
-    .lang-btn:hover {
       color: var(--text);
-      background: var(--mc-panel);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      outline: none;
     }
 
-    .lang-btn.active {
-      color: var(--hytale-yellow);
-      background: var(--mc-panel);
+    .lang-dropdown:hover {
+      border-color: var(--hytale-orange);
+    }
+
+    .lang-dropdown:focus {
+      border-color: var(--hytale-orange);
+    }
+
+    .lang-dropdown option {
+      background: var(--mc-dark);
+      color: var(--text);
+    }
+
+    .lang-selector::after {
+      content: '▼';
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 8px;
+      color: var(--text-dim);
+      pointer-events: none;
     }
   </style>
 </head>
@@ -805,8 +830,10 @@
       </div>
       <div class="header-right">
         <div class="lang-selector">
-          <button class="lang-btn" data-lang="en">EN</button>
-          <button class="lang-btn active" data-lang="uk">UA</button>
+          <select class="lang-dropdown" id="lang-select">
+            <option value="en">English</option>
+            <option value="uk">Українська</option>
+          </select>
         </div>
         <span class="uptime-display" id="uptime">00:00:00</span>
         <div class="status-badge">
@@ -1160,9 +1187,9 @@
     function setLanguage(lang) {
       currentLang = lang;
       localStorage.setItem('hytale-panel-lang', lang);
-      document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
-      });
+      document.body.setAttribute('data-lang', lang);
+      const langSelect = document.getElementById('lang-select');
+      if (langSelect) langSelect.value = lang;
       updateAllTranslations();
     }
 
@@ -1243,9 +1270,9 @@
       if (backItem) backItem.textContent = t('back');
     }
 
-    // Language selector events
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+    // Language selector event
+    document.getElementById('lang-select').addEventListener('change', (e) => {
+      setLanguage(e.target.value);
     });
 
     const socket = io();
@@ -1726,9 +1753,8 @@
     });
 
     // Initialize language on page load
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.lang === currentLang);
-    });
+    document.body.setAttribute('data-lang', currentLang);
+    document.getElementById('lang-select').value = currentLang;
     updateAllTranslations();
 
     socket.emit('check-files');
