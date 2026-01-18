@@ -61,6 +61,38 @@ jobs:
             exit 1
           fi
       
+      - name: Run tests
+        id: tests
+        working-directory: panel
+        continue-on-error: true
+        run: |
+          echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+          npm test -- --coverage --ci 2>&1 | tee test-output.txt
+          
+          # Extract results
+          if grep -q "Tests:.*passed" test-output.txt; then
+            PASSED=$(grep "Tests:" test-output.txt | grep -oP '\d+(?= passed)')
+            TOTAL=$(grep "Tests:" test-output.txt | grep -oP '\d+(?= total)')
+            echo "✅ **$PASSED/$TOTAL tests passed**" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Extract coverage
+          if grep -q "All files" test-output.txt; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Coverage" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -A1 "All files" test-output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check if tests passed
+          if grep -q "Test Suites:.*failed" test-output.txt; then
+            echo "::set-output name=status::failed"
+            exit 1
+          else
+            echo "::set-output name=status::passed"
+          fi
+      
       - name: Add review comment
         uses: actions/github-script@v8
         with:
@@ -103,6 +135,15 @@ jobs:
               body += '\n⚠️ **Review checklist:**\n';
               body += '- [ ] .env.example updated if new vars\n';
               body += '- [ ] Both compose files updated\n\n';
+            }
+            
+            // Test results
+            const testStatus = '${{ steps.tests.outputs.status }}';
+            if (testStatus === 'passed') {
+              body += '### ✅ Tests Passed\n\n';
+            } else if (testStatus === 'failed') {
+              body += '### ❌ Tests Failed\n';
+              body += '**Please fix failing tests before merging.**\n\n';
             }
             
             body += '---\n';
