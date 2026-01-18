@@ -1,23 +1,23 @@
 services:
   hytale:
     image: ketbom/hytale-server:latest
-    container_name: hytale-server
+    container_name: ${CONTAINER_NAME:-hytale-server}
     restart: unless-stopped
     stdin_open: true
     tty: true
     privileged: true
     ports:
-      - "5520:5520/udp"
+      - "${BIND_PORT:-5520}:${BIND_PORT:-5520}/udp"
     environment:
-      JAVA_XMS: "4G"
-      JAVA_XMX: "8G"
-      BIND_PORT: "5520"
-      BIND_ADDR: "0.0.0.0"
-      AUTO_DOWNLOAD: "true"
-      USE_G1GC: "true"
-      # VIEW_DISTANCE: "12"
-      # MAX_PLAYERS: "20"
-      # SERVER_NAME: "My Hytale Server"
+      JAVA_XMS: ${JAVA_XMS:-4G}
+      JAVA_XMX: ${JAVA_XMX:-8G}
+      BIND_PORT: ${BIND_PORT:-5520}
+      BIND_ADDR: ${BIND_ADDR:-0.0.0.0}
+      AUTO_DOWNLOAD: ${AUTO_DOWNLOAD:-true}
+      USE_G1GC: ${USE_G1GC:-true}
+      VIEW_DISTANCE: ${VIEW_DISTANCE:-}
+      MAX_PLAYERS: ${MAX_PLAYERS:-}
+      SERVER_NAME: ${SERVER_NAME:-}
     volumes:
       - ./server:/opt/hytale
       - /etc/machine-id:/etc/machine-id:ro
@@ -28,13 +28,13 @@ services:
     container_name: hytale-panel
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${PANEL_PORT:-3000}:${PANEL_PORT:-3000}"
     environment:
-      CONTAINER_NAME: "hytale-server"
-      # Auth credentials - CHANGE THESE!
-      PANEL_USER: "admin"
-      PANEL_PASS: "changeme"
-      # JWT_SECRET: "your-random-secret-here"
+      CONTAINER_NAME: ${CONTAINER_NAME:-hytale-server}
+      PANEL_PORT: ${PANEL_PORT:-3000}
+      PANEL_USER: ${PANEL_USER:-admin}
+      PANEL_PASS: ${PANEL_PASS:-changeme}
+      JWT_SECRET: ${JWT_SECRET:-}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
